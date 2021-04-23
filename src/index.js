@@ -29,8 +29,16 @@ app.use(express.json())
 
 app.use(express.static(publicDirectoryPath))
 
-io.on('connection', () => {
+const message = 'Welcome!'
+
+io.on('connection', (socket) => {
   console.log('new websocket connection')
+
+  socket.emit('message', message)
+
+  socket.on('sendMessage', (message) => {
+    io.emit('message', message)
+  })
 })
 server.listen(port, () => {
   console.log('Server is up on port ' + port)
