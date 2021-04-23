@@ -36,8 +36,21 @@ io.on('connection', (socket) => {
 
   socket.emit('message', message)
 
+  socket.broadcast.emit('message', 'A new user has joined')
+
   socket.on('sendMessage', (message) => {
     io.emit('message', message)
+  })
+
+  socket.on('sendLocation', (position) => {
+    io.emit(
+      'message',
+      `https://google.com/maps?q=${position.lat},${position.lon} `,
+    )
+  })
+
+  socket.on('disconnect', () => {
+    io.emit('message', 'A user has left.')
   })
 })
 server.listen(port, () => {
