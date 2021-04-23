@@ -8,6 +8,6 @@ const messageForm = document.querySelector('#message-form')
 
 messageForm.addEventListener('submit', (e) => {
   e.preventDefault()
-  const message = document.querySelector('input').value
+  const message = e.target.elements.message.value
   socket.emit('sendMessage', message)
 })
