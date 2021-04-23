@@ -8,7 +8,7 @@
     "dev": "env-cmd -f ./config/dev.env nodemon src/index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Roy Nevo",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1"
