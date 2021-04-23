@@ -1,8 +1,13 @@
 const express = require('express')
+const http = require('http')
 const path = require('path')
+const socketio = require('socket.io')
 
 const port = process.env.PORT
 const app = express()
+const server = http.createServer(app)
+const io = socketio(server)
+
 const publicDirectoryPath = path.join(__dirname, '../public')
 
 app.use(function (req, res, next) {
@@ -24,6 +29,9 @@ app.use(express.json())
 
 app.use(express.static(publicDirectoryPath))
 
-app.listen(port, () => {
+io.on('connection', () => {
+  console.log('new websocket connection')
+})
+server.listen(port, () => {
   console.log('Server is up on port ' + port)
 })
