@@ -48,11 +48,12 @@ io.on('connection', (socket) => {
     callback()
   })
 
-  socket.on('sendLocation', (position) => {
+  socket.on('sendLocation', (position, callback) => {
     io.emit(
       'message',
       `https://google.com/maps?q=${position.lat},${position.lon} `,
     )
+    callback()
   })
 
   socket.on('disconnect', () => {

@@ -22,9 +22,15 @@ document.querySelector('#send-location').addEventListener('click', () => {
     return alert('Geolocation not supported by your browser.')
   }
   navigator.geolocation.getCurrentPosition((position) => {
-    socket.emit('sendLocation', {
-      lat: position.coords.latitude,
-      lon: position.coords.longitude,
-    })
+    socket.emit(
+      'sendLocation',
+      {
+        lat: position.coords.latitude,
+        lon: position.coords.longitude,
+      },
+      () => {
+        console.log('Location shared!')
+      },
+    )
   })
 })
