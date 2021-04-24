@@ -6,3 +6,5 @@ bad-words
 mustach
 moment
 qs
+
+deployed on: https://quiet-tundra-06587.herokuapp.com/
