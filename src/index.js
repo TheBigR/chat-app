@@ -4,6 +4,12 @@ const path = require('path')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
 const { generateMessage, generateLocationMessage } = require('./utils/messages')
+const {
+  addUser,
+  removeUser,
+  getUser,
+  getUsersInRoom,
+} = require('./utils/users')
 
 const port = process.env.PORT
 const app = express()
@@ -33,21 +39,32 @@ app.use(express.static(publicDirectoryPath))
 io.on('connection', (socket) => {
   console.log('new websocket connection')
 
-  socket.emit('message', generateMessage('Welcome!'))
-
-  socket.broadcast.emit('message', generateMessage('A new user has joined'))
+  socket.on('join', ({ username, room }, callback) => {
+    const { error, user } = addUser({ id: socket.id, username, room })
+    if (error) {
+      return callback(error)
+    }
+    socket.join(user.room)
+    socket.emit('message', generateMessage('Welcome!'))
+    socket.broadcast
+      .to(user.room)
+      .emit('message', generateMessage(`${user.username} has joined`))
+    callback()
+  })
 
   socket.on('sendMessage', (message, callback) => {
     const filter = new Filter()
+    const user = getUser(socket.id)
     if (filter.isProfane(message)) {
       return callback('No bad words allowed!')
     }
-    io.emit('message', generateMessage(message))
+    io.to(user.room).emit('message', generateMessage(message))
     callback()
   })
 
   socket.on('sendLocation', (position, callback) => {
-    io.emit(
+    const user = getUser(socket.id)
+    io.to(user.room).emit(
       'locationMessage',
       generateLocationMessage(
         `https://google.com/maps?q=${position.lat},${position.lon} `,
@@ -57,7 +74,13 @@ io.on('connection', (socket) => {
   })
 
   socket.on('disconnect', () => {
-    io.emit('message', generateMessage('A user has left.'))
+    const user = removeUser(socket.id)
+    if (user) {
+      io.to(user.room).emit(
+        'message',
+        generateMessage(`${user.username} has left.`),
+      )
+    }
   })
 })
 server.listen(port, () => {
